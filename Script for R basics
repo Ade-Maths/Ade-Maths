@@ -1,0 +1,27 @@
+Introduction to working with R environment, it is crucial you start from here. You have to understand the working directory, you are working with.
+Ensure you remember where you save your document of interest last. I get to always advice you save in documents, this is because often times than normal, the default working directory is set to be as documents
+
+#########Set the Working Directory############
+
+Before reading any data, you must enure that the file of interest is present or found in the R working directory.
+
+setwd(“…”) will set the current working directory to a specific location
+getwd() will print out the current directory.
+> setwd("C:/mydata")
+
+When specifying the pathname, R reads forward slashes, whereas Windows reads backward slashes. Setting the working directory can eliminate path confusion.
+
+
+########Definition and Reading R Data Files#############
+
+RData Files
+
+Function: read.txt()  ....if in word format
+
+Assign a simple name that could serve so easily to remember
+
+AJana <- ("anatomy.txt")
+
+Or
+
+>  read.csv("anatomy.csv") for Excel files
