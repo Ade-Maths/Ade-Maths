@@ -1,7 +1,7 @@
 - 👋 Hi, I’m @Ade-Maths
 - 👀 I’m interested in bioinformatics 
 - 🌱 I’m currently learning big data analytics
-- 💞️ I’m looking to collaborate on R and other Analytic tools
+- 💞️ I’m looking forward to doing a collaboration on Microsoft excel, Python R and other Analytics
 - 📫 You can reach me via my mail ID: excellentagrotab@gmail.com 
 - 😄 Pronouns: We
 - ⚡ Fun fact: ...
