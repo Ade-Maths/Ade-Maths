@@ -1,0 +1,17 @@
+######################Entering your data and Reading Likewise#################################
+FileIdentifier <- read.csv("FileName.csv",  header=TRUE)
+str(FileIdentfier)
+##DO ENSURE THAT ALL TRAITS AND FACTORS ARE IN THERE RIGHT DATA TYPES, e.g all traits should be in numeric type#######################
+FileIdentifier$Trait<-as.numeric(FileIdentifiers$Trait)
+FileIdentifier$Trait<-as.factor(FileIdentifiers$Trait)  ..................... FOR FACTORS 
+###FOR ANALYSIS OF VARIANCE##############################################################
+FileMod<-aov(Trait~Factor1 + Factor 2 + Replicates + Factor1:Factor2, dat=FileIdentifier)
+###############LOAD AGRICOLAE PACKAGES###################################################
+library(agricolae)
+LSD.Test<-LSD.test(FileMod, c("Factor 1"))
+LSD.Test
+>>>>>>>>>>>>>>>>>>>>>Results will be displayed with RANKING>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+############FOR INTERACTIONS#############################################################
+LSD.Test<-LSD.test(FileMod, c("Factor 1", "Factor 2"))
+LSD.Test
+
