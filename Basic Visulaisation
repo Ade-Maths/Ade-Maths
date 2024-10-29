@@ -1,0 +1,60 @@
+ library(tidyverse)
+ data()
+ head(cars, 10)
+ 
+ cars %>%
+ lm(dist ~ speed, data =) %>%
+ summary()
+ 
+ mod<-lm(dist ~ speed, data= cars)
+ mod
+ 
+ attributes(mod)
+ mod$residuals
+ hist(mod$residuals)
+ 
+ new_speed<- data.frame(speed =c(10,15,20))
+ View(new_speed)
+ predict(mod, new_speeds) %>% round(1)
+ 
+ cars %>%
+ lm(dist ~ speed, data= .) %>%
+ predict(data.frame(speed = c(10,15,20))) %>%
+ round()
+ 
+ >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ 
+ library(tidyverse)
+ data()
+ View()
+ names()
+ 
+ >>>>>>single categorical data>>>>>>>>>>>>>>>>>
+ msleep %>%
+ drop_na(vore) %>%
+ ggplot(aes(fct_infreq(vore))) +
+ geom_bar(fill = "#97B3C6") +
+ coord_flip() +
+ theme_hw()
+
+>>>>>>>>>>>>>>>>>>One categorical data and two numeric data>>>>>>>>>>>>>>>>
+View()
+
+Orange %>%
+filter(Tree != "2") %>%
+ggplot(aes(age, circumference)) +
+geom_point() +
+gom_smooth() +
+facet_wrap(~Tree) +
+theme_bw() +
+labs (title = "")
+ 
+ 
+ Orange %>%
+filter(Tree != "1" & Tree != "2") %>%
+ggplot(aes(age, circumference, colour=)) +
+geom_point(size = 5, alpha = 0.3) +
+gom_smooth(size = 1) +
+theme_minimal() +
+labs (title = "")
+ 
