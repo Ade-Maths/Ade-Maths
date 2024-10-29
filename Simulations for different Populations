@@ -1,0 +1,136 @@
+Step 1: Set up simulation parameters
+nInd <- 200   # Number of individuals
+nChr <- 1     # Number of chromosomes
+segSites <- 20 # Number of loci (codominant markers)
+
+#Create founder populations and simulate parameters for each population
+
+founderPop_P1 <- runMacs(nInd = nInd, nChr = nChr, segSites = segSites)
+founderPop_P2 <- runMacs(nInd = nInd, nChr = nChr, segSites = segSites)
+
+
+SP_P1 <- SimParam$new(founderPop_P1)  # Create SimParam object for P1
+SP_P1$addSnpChip(nSnpPerChr = segSites)  # Add codominant markers (SNPs)
+
+SP_P2 <- SimParam$new(founderPop_P2)  # Create SimParam object for P2
+SP_P2$addSnpChip(nSnpPerChr = segSites)
+
+Step 4: Generate populations P1 and P2
+pop_P1 <- newPop(founderPop_P1, simParam = SP_P1)  # Use SP_P1 for P1
+pop_P2 <- newPop(founderPop_P2, simParam = SP_P2)  # Use SP_P2 for P2
+Step 5: Extract genotypes (multilocus, codominant markers)
+genotypes_P1 <- pullSnpGeno(pop_P1, simParam = SP_P1)  # Extract using SP_P1
+genotypes_P2 <- pullSnpGeno(pop_P2, simParam = SP_P2)  # Extract using SP_P2
+Step 6: Export genotypic data to CSV for both populations
+write.csv(genotypes_P1, file = "genotypes_P1.csv")
+write.csv(genotypes_P2, file = "genotypes_P2.csv")
+
+###############################SIMULATIONS###################
+
+Estimate molecular markers that follows HWE
+# Initialize a vector to store p-values for each marker
+
+p_values <- numeric(ncol(genotypes_P1)) 
+
+for (i in 1:ncol(genotypes_P1)) {   # Loop through each marker
+ 
+  marker_genotypes <- genotypes_P1[, i]   # Extract genotype data for each  marker
+
+  # Count the number of each genotype (0, 1, 2)
+  
+  count_0 <- sum(marker_genotypes == 0, na.rm = TRUE)
+  count_1 <- sum(marker_genotypes == 1, na.rm = TRUE)
+  count_2 <- sum(marker_genotypes == 2, na.rm = TRUE)
+
+  
+  total <- length(marker_genotypes[!is.na(marker_genotypes)])   # Total number of individuals
+
+  # Calculate allele frequencies
+  
+  p <- (2 * count_2 + count_1) / (2 * total)  # Frequency of A
+  q <- 1 - p  # Frequency of a
+
+  
+
+  # Calculate Expected Genotype Frequencies under HWE
+  
+  expected_0 <- q^2 * total  # Expected aa
+  expected_1 <- 2 * p * q * total  # Expected Aa
+  expected_2 <- p^2 * total  # Expected AA
+
+  
+  # Observed and expected genotype counts
+  
+  observed <- c(count_0, count_1, count_2)
+  
+  expected <- c(expected_0, expected_1, expected_2)
+
+  
+  if (all(expected > 0)) {   # Avoid division by zero in Chi-square test
+   
+    chi_square <- sum((observed - expected)^2 / expected)  # Chi-square test
+    p_value <- pchisq(chi_square, df = 1, lower.tail = FALSE)
+    p_values[i] <- p_value  # Store the p-value for each marker
+
+    
+  } else {
+    p_values[i] <- NA  # If expected values are zero, mark p-value as NA
+    
+  }
+}
+Perform Multiple Testing Correction
+p_values_bonferroni <- p.adjust(p_values, method = "bonferroni") # Bonferroni correction
+
+
+p_values_fdr <- p.adjust(p_values, method = "fdr")   # Benjamini-Hochberg (FDR) correction
+Store the results in a data frame
+results <- data.frame(
+  Marker = colnames(genotypes_P1),
+  P_value = p_values,
+  P_value_FDR = p_values_fdr
+)
+#Print the molecular markers that follow Hardy-Weinberg equilibrium using FDR correction
+markers_follow_hwe <- results[!is.na(results$Marker) & !is.na(results$P_value_FDR) &  results$P_value_FDR > 0.05, ] # Filter out rows with NA values 
+
+cat("\nMarkers that follow HWE (FDR-corrected p-value > 0.05):\n")
+## 
+## Markers that follow HWE (FDR-corrected p-value > 0.05):
+dim(markers_follow_hwe)
+## [1] 20  3
+print(markers_follow_hwe)
+
+#############################################
+
+df <- read.csv('genotypes_P1.csv');
+cell_value <- df[1, 5];
+print(cell_value)
+
+
+# Simulating self-fertilization of P1
+# Assuming self-fertilization means taking the genotype values and applying a simple model
+self_fertilization <- function(genotype) {
+  # For simplicity, let's assume self-fertilization retains the same genotype values
+  return(genotype)
+}
+
+# Applying the self-fertilization function to the first row (P1)
+P1_self_fertilization <- self_fertilization(df[1, -1])  # Exclude the first column (index)
+print(P1_self_fertilization)
+
+write.csv(P1_self_fertilization, file = "genotypes_P3.csv")
+
+###########################################################
+
+ Generating P3: self-fertilization of P1 for 200 individuals
+# Assuming self-fertilization means creating a new dataset with the same genotype values for 200 individuals
+set.seed(42)  # For reproducibility
+num_individuals <- 200
+P1_self_fertilization_200 <- data.frame(matrix(nrow = num_individuals, ncol = ncol(df)-1))  # Exclude the first column (index)
+colnames(P1_self_fertilization_200) <- colnames(df)[-1]  # Set column names
+
+# Fill the new dataframe with the genotype values of P1
+for (i in 1:num_individuals) {
+  P1_self_fertilization_200[i, ] <- df[1, -1]  # Copy P1 genotype values
+}
+
+print(head(P1_self_fertilization_200))
