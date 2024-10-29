@@ -181,3 +181,59 @@ P2 <- matrix(runif(200 * 5), nrow = 200, ncol = 5)
 # Run breeding program
 offspring <- breed_populations(P1,P2, generations = 5, mutation_rate = 0.02)
 print(offspring)
+
+################################################################################
+retro_cross_population <- function(P5, P1, generations = 1, mutation_rate = 0.01) {
+  # Check that both populations have the same dimensions
+  if (!all(dim(P5) == dim(P1))) {
+    stop("Both populations must have the same dimensions.")
+  }
+  
+  num_individuals <- nrow(P5)
+  num_traits <- ncol(P5)
+  
+  # Start with an initial hybrid population as offspring of both populations
+  offspring <- matrix(0, nrow = num_individuals, ncol = num_traits)
+  
+  # First cross between recurrent and donor population to create the initial hybrid
+  for (i in 1:num_individuals) {
+    parent1 <- P5[i, ]
+    parent2 <- P1[i, ]
+    offspring[i, ] <- (parent1 + parent2) / 2
+  }
+  
+  # Backcross with the recurrent parent for the specified number of generations
+  for (gen in 1:generations) {
+    new_offspring <- matrix(0, nrow = num_individuals, ncol = num_traits)
+    
+    for (i in 1:num_individuals) {
+      # Backcross with recurrent parent
+      parent1 <- P5[i, ]
+      parent2 <- P1[i, ]
+      
+      # Average traits, favoring the recurrent parent
+      child <- (2 * parent1 + parent2) / 3
+      
+      # Apply mutation
+      mutation <- rnorm(num_traits, mean = 0, sd = mutation_rate)
+      child <- child + mutation
+      
+      # Store child in new offspring matrix
+      new_offspring[i, ] <- child
+    }
+    
+    # Update offspring for the next generation
+    offspring <- new_offspring
+  }
+  
+  return(offspring)
+}
+
+# Initialize example populations
+set.seed(0)
+recurrent_pop <- matrix(runif(200 * 5), nrow = 200, ncol = 5)
+donor_pop <- matrix(runif(200 * 5), nrow = 200, ncol = 5)
+
+# Perform retrocrossing
+final_offspring <- retro_cross_population(recurrent_pop, donor_pop, generations = 5, mutation_rate = 0.02)
+print(final_offspring)
