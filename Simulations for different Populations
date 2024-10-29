@@ -1,3 +1,5 @@
+#######################FOUNDER POPULATIONS FOR p1 and p2###############################
+
 Step 1: Set up simulation parameters
 nInd <- 200   # Number of individuals
 nChr <- 1     # Number of chromosomes
@@ -99,7 +101,7 @@ dim(markers_follow_hwe)
 ## [1] 20  3
 print(markers_follow_hwe)
 
-#############################################
+#######################SELF FERTILIZATION, P1######################
 
 df <- read.csv('genotypes_P1.csv');
 cell_value <- df[1, 5];
@@ -119,7 +121,7 @@ print(P1_self_fertilization)
 
 write.csv(P1_self_fertilization, file = "genotypes_P3.csv")
 
-###########################################################
+##################################SELFING P2#########################
 
  Generating P3: self-fertilization of P1 for 200 individuals
 # Assuming self-fertilization means creating a new dataset with the same genotype values for 200 individuals
@@ -135,6 +137,46 @@ for (i in 1:num_individuals) {
 
 print(head(P1_self_fertilization_200))
 
+##############################HYBRIDIZATION#############################################
+
+library(ggplot2)
+
+# Define parental lines P1 and P2
+P1 <- c("A", "A", "B", "B", "C", "C")
+P2 <- c("a", "a", "b", "b", "c", "c")
+
+# Function to simulate hybridization
+hybridize <- function(P1, P2) {
+  hybrid <- vector("character", length(P1))
+  for (i in 1:length(P1)) {
+    hybrid[i] <- sample(c(P1[i], P2[i]), 1)
+  }
+  return(hybrid)
+}
+
+# Generate hybrid offspring
+F1 <- hybridize(P1, P2)
+
+# Display results
+cat("Parent 1 (P1):", P1, "\n")
+cat("Parent 2 (P2):", P2, "\n")
+cat("Hybrid (F1):", F1, "\n")
+
+# Visualize the hybridization
+data <- data.frame(
+  Parent = rep(c("P1", "P2", "F1"), each = length(P1)),
+  Gene = rep(1:length(P1), 3),
+  Allele = c(P1, P2, F1)
+)
+
+ggplot(data, aes(x = Gene, y = Parent, fill = Allele)) +
+  geom_tile() +
+  scale_fill_manual(values = c("A" = "blue", "a" = "lightblue", "B" = "green", "b" = "lightgreen", "C" = "red", "c" = "pink")) +
+  theme_minimal() +
+  labs(title = "Hybridization Cross",x = "Gene", y = "Parent")
+  
+
+##################################MIXING POPULATION##############################
 breed_populations <- function(P1, P22, generations = 1, mutation_rate = 0.01) {
   # Check that both populations have the same dimensions
   stopifnot(dim(P1) == dim(P2))
@@ -182,7 +224,7 @@ P2 <- matrix(runif(200 * 5), nrow = 200, ncol = 5)
 offspring <- breed_populations(P1,P2, generations = 5, mutation_rate = 0.02)
 print(offspring)
 
-################################################################################
+##########################################RETROCROSSING (P5 x P1)######################################
 retro_cross_population <- function(P5, P1, generations = 1, mutation_rate = 0.01) {
   # Check that both populations have the same dimensions
   if (!all(dim(P5) == dim(P1))) {
