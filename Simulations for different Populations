@@ -134,3 +134,50 @@ for (i in 1:num_individuals) {
 }
 
 print(head(P1_self_fertilization_200))
+
+breed_populations <- function(P1, P22, generations = 1, mutation_rate = 0.01) {
+  # Check that both populations have the same dimensions
+  stopifnot(dim(P1) == dim(P2))
+  num_individuals <- nrow(P1)
+  num_traits <- ncol(P1)
+  
+  # Run the breeding simulation for the specified number of generations
+  for (gen in 1:generations) {
+    # Initialize the offspring matrix
+    offspring <- matrix(0, nrow = num_individuals, ncol = num_traits)
+    
+    # Mix individuals from both populations
+    for (i in 1:num_individuals) {
+      # Select parents from each population
+      parent1 <- P1[i, ]
+      parent2 <- P2[i, ]
+      
+      # Create offspring by averaging the parents' traits
+      child <- (parent1 + parent2) / 2
+      
+      # Apply mutation
+      mutation <- rnorm(num_traits, mean = 0, sd = mutation_rate)
+      child <- child + mutation
+      
+      # Store child in offspring matrix
+      offspring[i, ] <- child
+    }
+    
+    # Update populations for the next generation
+    P1 <- offspring
+    P2 <- offspring
+  }
+  
+  return(offspring)
+}
+
+To use this function, initialize two example populations with random data and call breed_populations:
+
+# Initialize example populations
+set.seed(0)
+P1 <- matrix(runif(200 * 5), nrow = 200, ncol = 5)
+P2 <- matrix(runif(200 * 5), nrow = 200, ncol = 5)
+
+# Run breeding program
+offspring <- breed_populations(P1,P2, generations = 5, mutation_rate = 0.02)
+print(offspring)
